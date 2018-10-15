@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">StlRender</string>
+    <string name="stl_render">STL文件渲染</string>
+    <string name="gcode_render">Gcode文件渲染</string>
+    <string name="model_render">模型渲染</string>
+    <string name="error_fetch_data">文件解析失败</string>
+    <string name="model_file_not_found">未找到模型文件</string>
+    <string name="stl_load_progress_title">文件加载中…</string>
+</resources>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_fragment_content_bg">
+
+    <LinearLayout
+        android:id="@+id/ll_back_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/left_arrow"/>
+
+        <TextView
+            android:id="@+id/tv_back_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:textSize="22sp"
+            android:textColor="@color/fragment_content_bg"
+            />
+
+    </LinearLayout>
+
+        <cn.gongw.stlrender.stl.STLView
+            android:id="@+id/stlView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="top|end"
+            android:layout_marginRight="32dp"
+            android:layout_marginTop="16dp"
+            >
+            <TextView
+                android:id="@+id/tv_x_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/fragment_content_text"
+                android:textSize="18sp"
+                />
+            <TextView
+                android:id="@+id/tv_y_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/fragment_content_text"
+                android:textSize="18sp"
+                />
+
+            <TextView
+                android:id="@+id/tv_z_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/fragment_content_text"
+                android:layout_marginTop="8dp"
+                android:textSize="18sp"
+                />
+        </LinearLayout>
+
+</FrameLayout>
