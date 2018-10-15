@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 /**
- *
+ * 使用STLRender的GLSurfaceView
  * Created by gw on 2017/7/11.
  */
 public class STLView extends GLSurfaceView {

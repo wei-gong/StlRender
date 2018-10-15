@@ -170,10 +170,8 @@ public class STLRenderer implements Renderer {
 		//保存当前状态
 		gl.glPushMatrix();
 		gl.glColor4f(red, green, blue, alpha);
-		if(stlObject!=null) {
-			// 画Stl模型
-			stlObject.draw(gl);
-		}
+		// 画Stl模型
+		drawSTLObject(stlObject, gl);
 		//恢复之前保存的状态
 		gl.glPopMatrix();
 		//禁用颜色材质
@@ -217,6 +215,24 @@ public class STLRenderer implements Renderer {
 		triangleBuffer.put(vertexArray);
 		triangleBuffer.position(0);
 		return triangleBuffer;
+	}
+
+	/**
+	 * 绘制STLObject
+	 * @param stlObject
+	 * @param gl
+	 */
+	public void drawSTLObject(STLObject stlObject, GL10 gl) {
+		if (stlObject == null || stlObject.normalBuffer == null || stlObject.vertexBuffer == null) {
+			return;
+		}
+		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
+		gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
+		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, stlObject.vertexBuffer);
+		gl.glNormalPointer(GL10.GL_FLOAT,0, stlObject.normalBuffer);
+		gl.glDrawArrays(GL10.GL_TRIANGLES, 0, stlObject.triangleCount*3);
+		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
+		gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
 	}
 
 }
