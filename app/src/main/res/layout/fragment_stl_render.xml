@@ -32,7 +32,7 @@
 
     </LinearLayout>
 
-        <cn.gongw.stlrender.stl.STLView
+        <com.gongw.stlrender.stl.STLView
             android:id="@+id/stlView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
