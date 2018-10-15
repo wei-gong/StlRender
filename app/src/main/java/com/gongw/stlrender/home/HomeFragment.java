@@ -8,6 +8,7 @@ import android.widget.Button;
 import com.gongw.stlrender.R;
 import com.gongw.stlrender.base.BaseFragment;
 import com.gongw.stlrender.stl.StlRenderFragment;
+import com.gongw.stlrender.utils.FileUtils;
 import com.gongw.stlrender.utils.FragmentUtils;
 import java.io.File;
 import butterknife.InjectView;
@@ -35,11 +36,11 @@ public class HomeFragment extends BaseFragment {
 
     @OnClick({R.id.btn_choose_stl})
     void chooseFIle(View view){
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("*/*");
         switch (view.getId()){
             case R.id.btn_choose_stl:
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("*/*");
                 startActivityForResult(Intent.createChooser(intent, getString(R.string.stl_render)), REQUEST_STL_FILE);
                 break;
         }
@@ -49,7 +50,7 @@ public class HomeFragment extends BaseFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == Activity.RESULT_OK){
-            File file = new File(data.getData().getPath());
+            File file = FileUtils.getFileByUri(data.getData(), mContext);
             switch (requestCode){
                 case REQUEST_STL_FILE:
                     //打开STL渲染界面
@@ -61,4 +62,5 @@ public class HomeFragment extends BaseFragment {
             }
         }
     }
-}
+
+    }

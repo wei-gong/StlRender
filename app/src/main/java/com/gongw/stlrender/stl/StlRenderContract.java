@@ -16,10 +16,6 @@ public interface StlRenderContract {
         void showModel(STLObject stlObject);
         void showFetchProgressDialog(int progress);
         void hideFetchProgressDialog();
-        void showSizeX(float x);
-        void showSizeY(float y);
-        void showSizeZ(float z);
-        void showHomePageFragment();
     }
 
     interface Presenter extends BasePresenter {

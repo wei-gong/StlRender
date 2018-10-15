@@ -2,8 +2,6 @@ package com.gongw.stlrender.stl;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,20 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * STL文件解析器
  * Created by gw on 2016/6/29.
  */
 
 public class StlFetcher {
-    private static final String TAG = StlFetcher.class.getSimpleName();
+    private static Handler handler = new Handler(Looper.getMainLooper());
 
     /**
-     * fetch stl file to STLObject
+     * 异步解析STL文件，并在主线程回调StelFetchCallback
      * @param stlFile
      * @param callback
      */
     public static void fetchStlFile(final File stlFile, final StlFetchCallback callback){
-        final STLObject stlObject = new STLObject();
-        final Handler handler = new Handler(Looper.getMainLooper());
         new Thread(){
             @Override
             public void run() {
@@ -40,20 +37,20 @@ public class StlFetcher {
                         }
                     });
                 }
-                //check stl type, text or binary
+                //判断STL文件类型
                 if(isTextFile(stlFile)){
-                    Log.i(TAG, "fetch text file");
-                    fetchTextFile(stlObject, stlFile, handler, callback);
+                    //解析ASCII格式的STL文件
+                    fetchTextFile(stlFile, handler, callback);
                 }else{
-                    Log.i(TAG, "fetch binary file");
-                    fetchBinaryFile(stlObject, stlFile, handler, callback);
+                    //解析二进制格式的STL文件
+                    fetchBinaryFile(stlFile, handler, callback);
                 }
             }
         }.start();
     }
 
     /**
-     * check file type, text or binary
+     * 解析ASCII格式的STL文件
      * @param stlFile
      * @return
      */
@@ -85,53 +82,14 @@ public class StlFetcher {
         return false;
     }
 
-//    private static boolean isTextFile(File stlFile){
-//        boolean isText = true;
-//        LINE_NUM = 0;
-//        FileInputStream fis = null;
-//        try {
-//            fis = new FileInputStream(stlFile);
-//            int b;
-//            while((b = fis.read()) != -1){
-//                if (b == 0x0a || b == 0x0d || b == 0x09) {
-//                    // white spaces
-//                    if(b == 0x0a){
-//                        //remember line num for fetching text file
-//                        LINE_NUM ++;
-//                    }
-//                    continue;
-//                }
-//                if (b < 0x20 || (0xff & b) >= 0x80) {
-//                    // control codes
-//                    isText = false;
-//                    //line num no need for fetching binary file
-//                    LINE_NUM = 0;
-//                    break;
-//                }
-//            }
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }finally {
-//            if(fis != null){
-//                try {
-//                    fis.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//        return isText;
-//    }
-
     /**
-     * fetch stl file of text type
-     * konwledge about stl:
-     * <url>http://baike.baidu.com/link?url=pufdhCnxTAiup4GCn5WMGGoYR5E0ygeWpgbyKDvPop7mmbfkG1qos1Lc7K379QVgOQOUYxYYdzYzZYq-4m6flq</url>
-     * @param stlObject
+     * 解析ASCII格式的STL文件
      * @param stlFile
+     * @param handler
+     * @param callback
      */
-    private static void fetchTextFile(final STLObject stlObject, final File stlFile, final Handler handler, final StlFetchCallback callback){
+    private static void fetchTextFile(final File stlFile, final Handler handler, final StlFetchCallback callback){
+        final STLObject stlObject = new STLObject();
         List<Float> normalList = new ArrayList<>();
         List<Float> vertexList = new ArrayList<>();
         BufferedReader br = null;
@@ -144,7 +102,7 @@ public class StlFetcher {
             while ((str = br.readLine()) != null){
                 current += str.length();
                 str = str.trim();
-                //get triangle's normal info
+                //获取三角面片法向量数据
                 if(str.startsWith("facet normal ")){
                     str = str.replaceFirst("(^facet normal)([ \\f\\r\\t\\n]+)", "");
                     for(int i=0;i<3;i++){
@@ -154,7 +112,7 @@ public class StlFetcher {
                     }
                     stlObject.triangleCount ++;
                 }
-                //get triangle's vertex info
+                //获取三角面片顶点数据
                 if(str.startsWith("vertex ")){
                     str = str.replaceFirst("(^vertex)([ \\f\\r\\t\\n]+)", "");
                     float x = Float.parseFloat(str.substring(0, str.indexOf(" ")));
@@ -169,7 +127,7 @@ public class StlFetcher {
                 if(callback != null){
                     final int progress = (int) ((1.0f * current/size) * 100);
                     long time = System.currentTimeMillis();
-                    //update progress every 1 second
+                    //每1秒回调一次onProgress方法
                     if(time - lastTime > 1000){
                         lastTime = time;
                         handler.post(new Runnable() {
@@ -232,15 +190,13 @@ public class StlFetcher {
     }
 
     /**
-     * fetch stl file of binary type
-     * knowledge about stl:
-     * <url>http://baike.baidu.com/link?url=pufdhCnxTAiup4GCn5WMGGoYR5E0ygeWpgbyKDvPop7mmbfkG1qos1Lc7K379QVgOQOUYxYYdzYzZYq-4m6flq</url>
-     * @param stlObject
+     * 解析二进制格式的STL文件
      * @param stlFile
      * @param handler
      * @param callback
      */
-    private static void fetchBinaryFile(final STLObject stlObject, File stlFile, Handler handler, final StlFetchCallback callback){
+    private static void fetchBinaryFile(File stlFile, Handler handler, final StlFetchCallback callback){
+        final STLObject stlObject = new STLObject();
         FileInputStream fis = null;
         float[] normalArray;
         float[] vertexArray;
@@ -249,7 +205,7 @@ public class StlFetcher {
             fis.skip(80);
             byte[] vertex_size = new byte[4];
             fis.read(vertex_size);
-            //java use BigEdian，OpenGL needs LittleEdian
+            //大小端转换，java平台使用大端模式，OpenGL使用小端模式
             stlObject.triangleCount = getIntByLittleEndian(vertex_size, 0);
             normalArray = new float[stlObject.triangleCount * 3 * 3];
             vertexArray = new float[stlObject.triangleCount * 3 * 3];
@@ -257,14 +213,14 @@ public class StlFetcher {
             int num = 0;
             long lastTime = System.currentTimeMillis();
             while(fis.read(facet) != -1){
-                //get triangle's vertex info
+                //获取三角面片法向量数据
                 for(int i=0;i<3;i++){
                     normalArray[num ++] = Float.intBitsToFloat(getIntByLittleEndian(facet, 0));
                     normalArray[num ++] = Float.intBitsToFloat(getIntByLittleEndian(facet, 4));
                     normalArray[num ++] = Float.intBitsToFloat(getIntByLittleEndian(facet, 8));
                 }
 
-                //get triangle's vertex info
+                //获取三角面片顶点数据
                 for(int i=0;i<3;i++){
                     float x = Float.intBitsToFloat(getIntByLittleEndian(facet, (i*12)+12));
                     float y = Float.intBitsToFloat(getIntByLittleEndian(facet, (i*12)+16));
@@ -277,7 +233,7 @@ public class StlFetcher {
                 if(callback != null){
                     final int progress = (int) (1.0f * num/(stlObject.triangleCount*3*3) * 100);
                     long time = System.currentTimeMillis();
-                    //update progress every 1 second
+                    //每1秒回调一次onProgress方法
                     if(time - lastTime > 1000){
                         lastTime = time;
                         handler.post(new Runnable() {
@@ -331,7 +287,7 @@ public class StlFetcher {
     }
 
     /**
-     * update stl model's size info
+     * 更新STLObject的最大和最小x,y,z坐标
      * @param stlObject
      * @param x
      * @param y
@@ -359,7 +315,7 @@ public class StlFetcher {
     }
 
     /**
-     * change BigEdian to LittleEdian
+     * 大端转小端
      * @param bytes
      * @param offset
      * @return

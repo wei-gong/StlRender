@@ -1,13 +1,15 @@
 package com.gongw.stlrender.stl;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
-
+/**
+ *
+ * Created by gw on 2017/7/11.
+ */
 public class STLView extends GLSurfaceView {
 
 	private STLRenderer stlRenderer;
@@ -16,23 +18,15 @@ public class STLView extends GLSurfaceView {
 	private float previousX;
 	private float previousY;
 	private void changeDistance(float scale) {
-		if(stlRenderer.measurePrintSize){
-			stlRenderer.scale_object = scale;
-			if(listener!=null){
-				listener.onStlSizeChanged(getStlObjectSize());
-			}
-		}else{
-			stlRenderer.scale = scale;
-		}
+		stlRenderer.scale = scale;
 	}
-	// zoom rate (larger > 1.0f > smaller)
+	// 缩放比例
 	private float pinchScale = 1.0f;
 	private PointF pinchStartPoint = new PointF();
 	private float pinchStartZ = 0.0f;
 	private float pinchStartDistance = 0.0f;
 	private float pinchMoveX = 0.0f;
 	private float pinchMoveY = 0.0f;
-	// for touch event handling
 	private static final int TOUCH_NONE = 0;
 	private static final int TOUCH_DRAG = 1;
 	private static final int TOUCH_ZOOM = 2;
@@ -78,18 +72,9 @@ public class STLView extends GLSurfaceView {
 					previousX = pt.x;
 					previousY = pt.y;
 
-					if(stlRenderer.action == 0){
-						stlRenderer.positionX += dx * TOUCH_SCALE_FACTOR /2;
-						stlRenderer.positionY += -dy * TOUCH_SCALE_FACTOR /2;
-					}else if(stlRenderer.action == 1){
-						stlRenderer.positionZ += -dy * TOUCH_SCALE_FACTOR /2;
-					}else if(stlRenderer.action == 2){
-						stlRenderer.rotateZ += dx * TOUCH_SCALE_FACTOR;
-					}else{
-						stlRenderer.angleX +=  dy * TOUCH_SCALE_FACTOR;
-//						stlRenderer.angleY +=  dx * TOUCH_SCALE_FACTOR;
-						stlRenderer.angleZ +=  dx * TOUCH_SCALE_FACTOR;
-					}
+					stlRenderer.angleX +=  dy * TOUCH_SCALE_FACTOR;
+//					stlRenderer.angleY +=  dx * TOUCH_SCALE_FACTOR;
+					stlRenderer.angleZ +=  dx * TOUCH_SCALE_FACTOR;
 
 					pinchScale = getPinchDistance(event) / pinchStartDistance;
 					changeDistance(pinchScale);
@@ -137,18 +122,9 @@ public class STLView extends GLSurfaceView {
 					previousY = y;
 
 					// change view point
-					if(stlRenderer.action == 0){
-						stlRenderer.positionX += dx * TOUCH_SCALE_FACTOR /2;
-						stlRenderer.positionY += -dy * TOUCH_SCALE_FACTOR /2;
-					}else if(stlRenderer.action == 1){
-						stlRenderer.positionZ += -dy * TOUCH_SCALE_FACTOR /2;
-					}else if(stlRenderer.action == 2){
-						stlRenderer.rotateZ += dx * TOUCH_SCALE_FACTOR;
-					}else{
-						stlRenderer.angleX +=  dy * TOUCH_SCALE_FACTOR;
-//						stlRenderer.angleY +=  dx * TOUCH_SCALE_FACTOR;
-						stlRenderer.angleZ +=  dx * TOUCH_SCALE_FACTOR;
-					}
+					stlRenderer.angleX +=  dy * TOUCH_SCALE_FACTOR;
+//					stlRenderer.angleY +=  dx * TOUCH_SCALE_FACTOR;
+					stlRenderer.angleZ +=  dx * TOUCH_SCALE_FACTOR;
 
 					stlRenderer.requestRedraw();
 					requestRender();
@@ -179,7 +155,6 @@ public class STLView extends GLSurfaceView {
 			  x = event.getX(0) - event.getX(1);
 			  y = event.getY(0) - event.getY(1);
 		    } catch (IllegalArgumentException e) {
-		        // TODO Auto-generated catch block
 		        e.printStackTrace();
 		    }
 		return (float) Math.sqrt(x * x + y * y);
@@ -195,90 +170,4 @@ public class STLView extends GLSurfaceView {
 		pt.y = (event.getY(0) + event.getY(1)) * 0.5f;
 	}
 
-	/**
-	 * 更新object 刷新界面
-	 * @param stlObject
-	 */
-	public void requestRedraw(STLObject stlObject){
-		stlRenderer.requestRedraw(stlObject);
-	}
-	/**
-	 * 刷新界面
-	 */
-	public void requestRedraw(){
-		stlRenderer.requestRedraw();
-	}
-	
-	public void delete (){
-		stlRenderer.delete();
-	}
-	/**
-	 * 平移开关
-	 */
-	public boolean setAction(int i){
-		if (stlRenderer.action == i) {
-			stlRenderer.action = STLRenderer.ACTION_NONE;
-			return false;
-		} else {
-			stlRenderer.action = i;
-			return true;
-		}
-	}
-	/**
-	 * 将模型置于中央底部位置
-	 */
-	public void putCenterBottom(){
-		stlRenderer.putCenterBottom();
-		requestRedraw();
-	}
-
-	/**
-	 * 调节打印尺寸开关
-	 */
-	public boolean toogleMeasureSize(){
-		return stlRenderer.measurePrintSize = !stlRenderer.measurePrintSize;
-	}
-
-	/**
-	 * 设置渲染颜色
-	 * @param color
-	 */
-	public void setColor(int color){
-		stlRenderer.red = Color.red(color) / 255f;
-		stlRenderer.green = Color.green(color) / 255f;
-		stlRenderer.blue = Color.blue(color) / 255f;
-		requestRedraw();
-	}
-	/**
-	 * 判断当前stl是否超出打印边界
-	 */
-	public boolean isStlOverLine(){
-		return stlRenderer.isOverLine;
-	}
-	/**
-	 * 获取stl的设置参数
-	 */
-	public String getStlSetting(){
-		return "scale="+stlRenderer.scale_object_rember+"&offset_x="+stlRenderer.positionX+"&offset_y="+stlRenderer.positionY+"&offset_z="+stlRenderer.positionZ+"&rotate="+stlRenderer.rotateZ;
-	}
-
-	public float[] getStlObjectSize(){
-		if(stlRenderer.getStlObject()!=null){
-			float x = stlRenderer.scale_object_rember * (stlRenderer.getStlObject().maxX - stlRenderer.getStlObject().minX);
-			float y = stlRenderer.scale_object_rember * (stlRenderer.getStlObject().maxY - stlRenderer.getStlObject().minY);
-			float z = stlRenderer.scale_object_rember * (stlRenderer.getStlObject().maxZ - stlRenderer.getStlObject().minZ);
-			return new float[]{x, y, z};
-		}
-		return new float[]{0, 0, 0};
-	}
-
-	public interface OnStlSizeChangedListener{
-		void onStlSizeChanged(float[] newSize);
-	}
-
-	OnStlSizeChangedListener listener;
-
-	public void setOnStlSizeChangedListener(OnStlSizeChangedListener listener){
-		this.listener = listener;
-	}
 }
